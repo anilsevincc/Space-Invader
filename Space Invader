@@ -1,0 +1,147 @@
+public class Main {
+    public static void main(String[] args) {
+        SimpleGame simpleGame = new SimpleGame();
+    }
+}
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Random;
+
+import static java.awt.Color.*;
+
+public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
+//initiating variables
+    JLabel label;
+    ArrayList<JLabel> fallingObjects;
+    ArrayList<Integer> fallingObjectXPositions;
+    ArrayList<Integer> fallingObjectYPositions;
+    Random random = new Random();//meteors
+    ImageIcon playerIcon = new ImageIcon("rocket.png");//you can find the png in the files
+    ImageIcon fallingObject = new ImageIcon("meteor.png");//you can find the png in the files
+    Timer timer;
+    int playerX = 200;
+    int playerY = 600;
+    int fallingObjectX;
+    int fallingOjectY = 0;
+    int objectSpeed = 10;//speed and count is for level design for other versions
+    int objectCount = 9;
+    int moveSpeed = 10;
+    boolean moveLeft = false;
+    boolean moveRight = false;
+    boolean gameOver = false;
+
+    public SimpleGame(){
+//frame settings
+        this.setPreferredSize(new Dimension(800,800));
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(null);
+        this.getContentPane().setBackground(black);
+//rocket settings
+        label = new JLabel();
+        label.setIcon(playerIcon);
+        label.setBounds(playerX,playerY, playerIcon.getIconWidth(), playerIcon.getIconHeight());
+
+//meteors settings
+        fallingObjects = new ArrayList<>();
+        fallingObjectXPositions = new ArrayList<>();
+        fallingObjectYPositions = new ArrayList<>();
+
+        for (int i = 0; i<objectCount; i++){
+            JLabel label2 = new JLabel();
+            label2.setIcon(fallingObject);
+            fallingObjectX = random.nextInt(800 - fallingObject.getIconWidth());
+
+            fallingObjectXPositions.add(fallingObjectX);
+            fallingObjectYPositions.add(fallingOjectY);
+            label2.setBounds(fallingObjectX,fallingOjectY,fallingObject.getIconWidth(),fallingObject.getIconHeight());
+
+            fallingObjects.add(label2);
+            this.add(label2);
+        }
+
+//adding everything to the frame
+
+        this.addKeyListener(this);
+        //this.setFocusable(true);
+        //this.requestFocusInWindow();
+
+        this.add(label);
+        //this.add(label2);
+        this.setVisible(true);
+        this.pack();
+
+        timer = new Timer(20,this);
+        timer.start();
+
+    }
+
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+//rocket moves
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+            moveLeft = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+            moveRight = true;
+        }
+        label.setBounds(playerX,playerY,playerIcon.getIconWidth(),playerIcon.getIconHeight());
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+            moveLeft = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+            moveRight = false;
+        }
+    }
+//frame restrictions
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (!gameOver) {
+
+            if (moveLeft && playerX > 0) {
+                playerX -= moveSpeed;
+            }
+            if (moveRight && playerX < 800 - playerIcon.getIconWidth()) {
+                playerX += moveSpeed;
+            }
+            label.setBounds(playerX, playerY, playerIcon.getIconWidth(), playerIcon.getIconHeight());
+
+//meteor falling method
+            for (int i = 0; i < fallingObjectYPositions.size(); i++) {
+                int newY = fallingObjectYPositions.get(i) + objectSpeed;
+                fallingObjectYPositions.set(i, newY);
+
+                if (newY > 800) {
+                    fallingObjectYPositions.set(i, random.nextInt(400) - 400);
+                    fallingObjectXPositions.set(i, random.nextInt(800 - fallingObject.getIconWidth()));
+                }
+                fallingObjects.get(i).setBounds(fallingObjectXPositions.get(i), fallingObjectYPositions.get(i), fallingObject.getIconWidth(), fallingObject.getIconHeight());
+
+//collision watcher
+                if (label.getBounds().intersects(fallingObjects.get(i).getBounds())) {
+                    gameOver = true;
+                    timer.stop();
+                    JOptionPane.showMessageDialog(this, "Game Over!");
+                    break;
+                }
+
+            }
+        }
+        repaint();
+    }
+}
+
