@@ -4,6 +4,7 @@ public class Main {
     }
 }
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,41 +17,47 @@ import java.util.Random;
 import static java.awt.Color.*;
 
 public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
-//initiating variables
+
     JLabel label;
     ArrayList<JLabel> fallingObjects;
     ArrayList<Integer> fallingObjectXPositions;
     ArrayList<Integer> fallingObjectYPositions;
-    Random random = new Random();//meteors
-    ImageIcon playerIcon = new ImageIcon("rocket.png");//you can find the png in the files
-    ImageIcon fallingObject = new ImageIcon("meteor.png");//you can find the png in the files
+    ArrayList<JLabel> bullets;
+    ArrayList<Integer> bulletYPositions;
+    Random random = new Random();
+    ImageIcon playerIcon = new ImageIcon("rocket.png");
+    ImageIcon fallingObject = new ImageIcon("meteor.png");
+    ImageIcon bulletIcon = new ImageIcon("bullet.png");
     Timer timer;
     int playerX = 200;
     int playerY = 600;
     int fallingObjectX;
     int fallingOjectY = 0;
-    int objectSpeed = 10;//speed and count is for level design for other versions
+    int objectSpeed = 10;
     int objectCount = 9;
     int moveSpeed = 10;
+    int bulletSpeed = 15;
+    int bulletCount = 10;
     boolean moveLeft = false;
     boolean moveRight = false;
     boolean gameOver = false;
 
     public SimpleGame(){
-//frame settings
         this.setPreferredSize(new Dimension(800,800));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
         this.getContentPane().setBackground(black);
-//rocket settings
+
         label = new JLabel();
         label.setIcon(playerIcon);
         label.setBounds(playerX,playerY, playerIcon.getIconWidth(), playerIcon.getIconHeight());
 
-//meteors settings
+
         fallingObjects = new ArrayList<>();
         fallingObjectXPositions = new ArrayList<>();
         fallingObjectYPositions = new ArrayList<>();
+        bullets = new ArrayList<>();
+        bulletYPositions = new ArrayList<>();
 
         for (int i = 0; i<objectCount; i++){
             JLabel label2 = new JLabel();
@@ -65,14 +72,10 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
             this.add(label2);
         }
 
-//adding everything to the frame
 
         this.addKeyListener(this);
-        //this.setFocusable(true);
-        //this.requestFocusInWindow();
 
         this.add(label);
-        //this.add(label2);
         this.setVisible(true);
         this.pack();
 
@@ -84,9 +87,18 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
+        if (e.getKeyChar() == ' '){
+            if (bullets.size() < bulletCount){
+                JLabel bullet = new JLabel(bulletIcon);
+                bullet.setBounds(playerX + playerIcon.getIconWidth() / 2 - bulletIcon.getIconWidth() / 2, playerY,bulletIcon.getIconWidth(),bulletIcon.getIconHeight());
+                bullets.add(bullet);
+                bulletYPositions.add(playerY);
+                this.add(bullet);
+            }
+        }
 
     }
-//rocket moves
+
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT){
@@ -107,7 +119,7 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
             moveRight = false;
         }
     }
-//frame restrictions
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!gameOver) {
@@ -120,7 +132,6 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
             }
             label.setBounds(playerX, playerY, playerIcon.getIconWidth(), playerIcon.getIconHeight());
 
-//meteor falling method
             for (int i = 0; i < fallingObjectYPositions.size(); i++) {
                 int newY = fallingObjectYPositions.get(i) + objectSpeed;
                 fallingObjectYPositions.set(i, newY);
@@ -131,7 +142,7 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
                 }
                 fallingObjects.get(i).setBounds(fallingObjectXPositions.get(i), fallingObjectYPositions.get(i), fallingObject.getIconWidth(), fallingObject.getIconHeight());
 
-//collision watcher
+
                 if (label.getBounds().intersects(fallingObjects.get(i).getBounds())) {
                     gameOver = true;
                     timer.stop();
@@ -139,6 +150,20 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
                     break;
                 }
 
+            }
+
+            for (int i = 0; i < bullets.size(); i++){
+                int newY = bulletYPositions.get(i) - bulletSpeed;
+                bulletYPositions.set(i, newY);
+
+                if (newY < 0) { // Mermi ekrandan çıkarsa sil
+                    this.remove(bullets.get(i));
+                    bullets.remove(i);
+                    bulletYPositions.remove(i);
+                    i--;
+                } else {
+                    bullets.get(i).setBounds(bullets.get(i).getX(), newY, bulletIcon.getIconWidth(), bulletIcon.getIconHeight());
+                }
             }
         }
         repaint();
