@@ -4,6 +4,7 @@ public class Main {
     }
 }
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -33,7 +34,7 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
     int fallingObjectX;
     int fallingOjectY = 0;
     int objectSpeed = 10;
-    int objectCount = 9;
+    int objectCount = 3;
     int moveSpeed = 10;
     int bulletSpeed = 15;
     int bulletCount = 10;
@@ -150,6 +151,26 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
                                                     , fallingObject.getIconWidth() -5
                                                     ,fallingObject.getIconHeight() -10);
 
+                boolean collisionDetected = false;
+
+                for (int j = 0; j < bullets.size(); j++) {
+                    if (bullets.get(j).getBounds().intersects(meteorBounds)) {
+                        // Mermiyi kaldır
+                        this.remove(bullets.get(j));
+                        bullets.remove(j);
+                        bulletYPositions.remove(j);
+                        j--;
+                        fallingObjectYPositions.set(i, -100);
+                        fallingObjectXPositions.set(i, random.nextInt(800 - fallingObject.getIconWidth()));
+                        fallingObjects.get(i).setBounds(fallingObjectXPositions.get(i),
+                                                      -100,
+                                                        fallingObject.getIconWidth(),
+                                                        fallingObject.getIconHeight());
+                        collisionDetected = true;
+                        break;
+                    }
+                }
+
                 if (playerBounds.intersects(meteorBounds)) {
                     gameOver = true;
                     timer.stop();
@@ -176,6 +197,6 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
         repaint();
 
     }
-    
+
 }
 
