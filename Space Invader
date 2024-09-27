@@ -4,7 +4,6 @@ public class Main {
     }
 }
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -142,8 +141,16 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
                 }
                 fallingObjects.get(i).setBounds(fallingObjectXPositions.get(i), fallingObjectYPositions.get(i), fallingObject.getIconWidth(), fallingObject.getIconHeight());
 
+                Rectangle playerBounds = new Rectangle(playerX + 25
+                                                    , playerY + 25
+                                                    , playerIcon.getIconWidth() -35
+                                                    , playerIcon.getIconHeight() -5);
+                Rectangle meteorBounds = new Rectangle(fallingObjectXPositions.get(i) + 10
+                                                    ,fallingObjectYPositions.get(i) + 35
+                                                    , fallingObject.getIconWidth() -5
+                                                    ,fallingObject.getIconHeight() -10);
 
-                if (label.getBounds().intersects(fallingObjects.get(i).getBounds())) {
+                if (playerBounds.intersects(meteorBounds)) {
                     gameOver = true;
                     timer.stop();
                     JOptionPane.showMessageDialog(this, "Game Over!");
@@ -167,6 +174,8 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
             }
         }
         repaint();
+
     }
+    
 }
 
