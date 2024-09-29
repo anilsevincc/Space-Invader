@@ -4,13 +4,14 @@ public class Main {
     }
 }
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -34,19 +35,29 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
     int fallingObjectX;
     int fallingOjectY = 0;
     int objectSpeed = 10;
-    int objectCount = 3;
+    int objectCount = 8;
     int moveSpeed = 10;
     int bulletSpeed = 15;
     int bulletCount = 10;
     boolean moveLeft = false;
     boolean moveRight = false;
     boolean gameOver = false;
+    int score = 0;
+    JLabel labelScore;
+    JPanel panelEndGame;
+    JLabel labelGameOver;
+    //Font customFont;
+    JLabel labelTryAgain;
+    JLabel labelYesNo;
 
     public SimpleGame(){
         this.setPreferredSize(new Dimension(800,800));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
+        this.setResizable(false);
         this.getContentPane().setBackground(black);
+
+
 
         label = new JLabel();
         label.setIcon(playerIcon);
@@ -72,9 +83,80 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
             this.add(label2);
         }
 
+        labelScore = new JLabel();
+        labelScore.setBounds(10,0,100,50);
+        labelScore.setBackground(black);
+        labelScore.setForeground(white);
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("PressStart2p-Regular.ttf")).deriveFont(25f);
+            labelScore.setFont(customFont);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (FontFormatException e) {
+            throw new RuntimeException(e);
+        }
+        labelScore.setText(String.valueOf(score) + " P");
+        labelScore.setOpaque(true);
+
+        panelEndGame = new JPanel();
+        panelEndGame.setBounds(150,200,500,400);
+        panelEndGame.setLayout(new BoxLayout(panelEndGame, BoxLayout.Y_AXIS));
+        panelEndGame.add(Box.createRigidArea(new Dimension(0,50)));
+        panelEndGame.setBackground(black);
+        panelEndGame.setVisible(false);
+
+        labelGameOver = new JLabel();
+        labelGameOver.setPreferredSize(new Dimension(200,100));
+        labelGameOver.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("PressStart2p-Regular.ttf")).deriveFont(35f);
+            labelGameOver.setFont(customFont);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        labelGameOver.setText("GAME OVER");
+        labelGameOver.setBackground(black);
+        labelGameOver.setForeground(white);
+        labelGameOver.setVisible(true);
+
+
+        labelTryAgain = new JLabel();
+        labelTryAgain.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //labelTryAgain.setBounds(250,300, 350, 100);
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("PressStart2p-Regular.ttf")).deriveFont(25f);
+            labelTryAgain.setFont(customFont);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        labelTryAgain.setText("TRY AGAIN?");
+        labelTryAgain.setBackground(black);
+        labelTryAgain.setForeground(white);
+        labelTryAgain.setVisible(true);
+
+        labelYesNo = new JLabel();
+        labelYesNo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("PressStart2p-Regular.ttf")).deriveFont(25f);
+            labelYesNo.setFont(customFont);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        labelYesNo.setText("Y / N ?");
+        labelYesNo.setBackground(black);
+        labelYesNo.setForeground(white);
+
+        panelEndGame.add(labelGameOver);
+        panelEndGame.add(Box.createRigidArea(new Dimension(0,50)));
+        panelEndGame.add(labelTryAgain);
+        panelEndGame.add(Box.createRigidArea(new Dimension(0,50)));
+        panelEndGame.add(labelYesNo);
 
         this.addKeyListener(this);
 
+        this.add(panelEndGame);
+        this.add(labelScore);
         this.add(label);
         this.setVisible(true);
         this.pack();
@@ -108,6 +190,11 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
             moveRight = true;
         }
         label.setBounds(playerX,playerY,playerIcon.getIconWidth(),playerIcon.getIconHeight());
+        if (gameOver && e.getKeyCode() == KeyEvent.VK_Y){
+            resetGame();
+        } else if (gameOver && (e.getKeyCode() == KeyEvent.VK_N)) {
+            System.exit(0);
+        }
     }
 
     @Override
@@ -167,6 +254,8 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
                                                         fallingObject.getIconWidth(),
                                                         fallingObject.getIconHeight());
                         collisionDetected = true;
+                        score++;
+                        labelScore.setText(String.valueOf(score) + " P");
                         break;
                     }
                 }
@@ -174,7 +263,9 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
                 if (playerBounds.intersects(meteorBounds)) {
                     gameOver = true;
                     timer.stop();
-                    JOptionPane.showMessageDialog(this, "Game Over!");
+                    //JOptionPane.showMessageDialog(this, "Game Over!");
+                    //labelGameOver.setVisible(true);
+                    panelEndGame.setVisible(true);
                     break;
                 }
 
@@ -196,6 +287,28 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
         }
         repaint();
 
+    }
+    public void resetGame(){
+        playerX = 200;
+        playerY = 600;
+        score = 0;
+        labelScore.setText(score + " P");
+        gameOver = false;
+
+        for (int i = 0; i < objectCount; i++) {
+            fallingObjectYPositions.set(i, random.nextInt(400) - 400);  // Üstten düşmesi için
+            fallingObjectXPositions.set(i, random.nextInt(800 - fallingObject.getIconWidth()));
+            fallingObjects.get(i).setBounds(fallingObjectXPositions.get(i), fallingObjectYPositions.get(i), fallingObject.getIconWidth(), fallingObject.getIconHeight());
+        }
+
+        for (int i = 0; i < bullets.size(); i++) {
+            this.remove(bullets.get(i));
+        }
+        bullets.clear();
+        bulletYPositions.clear();
+
+        panelEndGame.setVisible(false);  // Oyun bitti ekranını gizle
+        timer.start();
     }
 
 }
