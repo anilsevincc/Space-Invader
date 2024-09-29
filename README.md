@@ -1,13 +1,19 @@
 Trying to make a space invader like game.
 You need meteor.png, rocket.png, bullet.png to run
 
-Hitbox issues solved, shooting mechanics added. Destroying meteors added. 
-Scoring system, game over screen and reset system added.
-Menu, visual upgrades and more will be added.
+First version is out now. Added menu, upgraded the visuals, added scoring system and gameover menu.
+It is playable like a game now.
+More features will be added.
 
-![image](https://github.com/user-attachments/assets/c197e882-e4fa-4463-817a-19d0627b4f54)
-![image](https://github.com/user-attachments/assets/bc9b86d3-1e44-4c02-97da-8ebf929e89d2)
+Anıl SEVİNÇ #2024#
 
-![rocket](https://github.com/user-attachments/assets/aa2c35c7-c023-4469-ad42-39d90e021c02)
-![meteor](https://github.com/user-attachments/assets/46ae9d38-3cc0-48cd-aec1-fb03bb685f47)
-![bullet](https://github.com/user-attachments/assets/ef4d0375-cb58-41c7-bc44-f56207588165)
+
+![image](https://github.com/user-attachments/assets/3003305e-0e92-47ce-b718-108c416603a5)
+![image](https://github.com/user-attachments/assets/a454bdec-e7a7-4458-8c18-e9c4abb7a0ce)
+![image](https://github.com/user-attachments/assets/769b34f6-909d-4e63-bf73-5663f66cac50)
+
+
+![rocketvector](https://github.com/user-attachments/assets/6b52aa32-2a59-4e14-bdfb-afce62fa5ca3)
+![meteorvector](https://github.com/user-attachments/assets/d22286ae-0c26-4aab-b0b7-acff90cc4926)
+![bulletvector](https://github.com/user-attachments/assets/13d59e49-8473-45a1-9971-3aaaa1ec502c)
+
