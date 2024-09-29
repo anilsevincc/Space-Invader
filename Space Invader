@@ -4,6 +4,7 @@ public class Main {
     }
 }
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,7 +18,7 @@ import java.util.Random;
 
 import static java.awt.Color.*;
 
-public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
+public class SimpleGame extends JFrame implements ActionListener, KeyListener {
 
     JLabel label;
     ArrayList<JLabel> fallingObjects;
@@ -26,14 +27,14 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
     ArrayList<JLabel> bullets;
     ArrayList<Integer> bulletYPositions;
     Random random = new Random();
-    ImageIcon playerIcon = new ImageIcon("rocket.png");
-    ImageIcon fallingObject = new ImageIcon("meteor.png");
-    ImageIcon bulletIcon = new ImageIcon("bullet.png");
+    ImageIcon playerIcon = new ImageIcon("rocketvector.png");
+    ImageIcon fallingObject = new ImageIcon("meteorvector.png");
+    ImageIcon bulletIcon = new ImageIcon("bulletvector.png");
     Timer timer;
     int playerX = 200;
     int playerY = 600;
     int fallingObjectX;
-    int fallingOjectY = 0;
+    int fallingOjectY = -50;
     int objectSpeed = 10;
     int objectCount = 8;
     int moveSpeed = 10;
@@ -49,19 +50,26 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
     //Font customFont;
     JLabel labelTryAgain;
     JLabel labelYesNo;
+    boolean startGame = false;
+    JPanel startMenu;
+    JLabel labelTitle;
+    JLabel labelStart;
+    JLabel labelExit;
 
-    public SimpleGame(){
-        this.setPreferredSize(new Dimension(800,800));
+    public SimpleGame() {
+        this.setPreferredSize(new Dimension(800, 800));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
+        this.setTitle("Simple Game");
+        this.setIconImage(playerIcon.getImage());
         this.setResizable(false);
         this.getContentPane().setBackground(black);
 
 
-
         label = new JLabel();
         label.setIcon(playerIcon);
-        label.setBounds(playerX,playerY, playerIcon.getIconWidth(), playerIcon.getIconHeight());
+        label.setBounds(playerX, playerY, playerIcon.getIconWidth(), playerIcon.getIconHeight());
+        label.setVisible(false);
 
 
         fallingObjects = new ArrayList<>();
@@ -70,21 +78,22 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
         bullets = new ArrayList<>();
         bulletYPositions = new ArrayList<>();
 
-        for (int i = 0; i<objectCount; i++){
+        for (int i = 0; i < objectCount; i++) {
             JLabel label2 = new JLabel();
             label2.setIcon(fallingObject);
             fallingObjectX = random.nextInt(800 - fallingObject.getIconWidth());
 
             fallingObjectXPositions.add(fallingObjectX);
             fallingObjectYPositions.add(fallingOjectY);
-            label2.setBounds(fallingObjectX,fallingOjectY,fallingObject.getIconWidth(),fallingObject.getIconHeight());
+            label2.setBounds(fallingObjectX, fallingOjectY, fallingObject.getIconWidth(), fallingObject.getIconHeight());
 
             fallingObjects.add(label2);
             this.add(label2);
+
         }
 
         labelScore = new JLabel();
-        labelScore.setBounds(10,0,100,50);
+        labelScore.setBounds(10, 0, 100, 50);
         labelScore.setBackground(black);
         labelScore.setForeground(white);
         try {
@@ -97,16 +106,17 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
         }
         labelScore.setText(String.valueOf(score) + " P");
         labelScore.setOpaque(true);
+        labelScore.setVisible(false);
 
         panelEndGame = new JPanel();
-        panelEndGame.setBounds(150,200,500,400);
+        panelEndGame.setBounds(150, 200, 500, 400);
         panelEndGame.setLayout(new BoxLayout(panelEndGame, BoxLayout.Y_AXIS));
-        panelEndGame.add(Box.createRigidArea(new Dimension(0,50)));
+        panelEndGame.add(Box.createRigidArea(new Dimension(0, 50)));
         panelEndGame.setBackground(black);
         panelEndGame.setVisible(false);
 
         labelGameOver = new JLabel();
-        labelGameOver.setPreferredSize(new Dimension(200,100));
+        labelGameOver.setPreferredSize(new Dimension(200, 100));
         labelGameOver.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         try {
@@ -123,7 +133,7 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
 
         labelTryAgain = new JLabel();
         labelTryAgain.setAlignmentX(Component.CENTER_ALIGNMENT);
-        //labelTryAgain.setBounds(250,300, 350, 100);
+
         try {
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("PressStart2p-Regular.ttf")).deriveFont(25f);
             labelTryAgain.setFont(customFont);
@@ -148,31 +158,82 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
         labelYesNo.setForeground(white);
 
         panelEndGame.add(labelGameOver);
-        panelEndGame.add(Box.createRigidArea(new Dimension(0,50)));
+        panelEndGame.add(Box.createRigidArea(new Dimension(0, 50)));
         panelEndGame.add(labelTryAgain);
-        panelEndGame.add(Box.createRigidArea(new Dimension(0,50)));
+        panelEndGame.add(Box.createRigidArea(new Dimension(0, 50)));
         panelEndGame.add(labelYesNo);
 
+        startMenu = new JPanel();
+        startMenu.setBounds(0,0,800,800);
+        startMenu.setLayout(new BoxLayout(startMenu, BoxLayout.Y_AXIS));
+        startMenu.add(Box.createRigidArea(new Dimension(0, 150)));
+        startMenu.setBackground(black);
+        startMenu.setVisible(true);
+
+        labelTitle = new JLabel();
+        labelTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("PressStart2p-Regular.ttf")).deriveFont(25f);
+            labelTitle.setFont(customFont);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        labelTitle.setText("Simple Game - Space Invader");
+        labelTitle.setBackground(black);
+        labelTitle.setForeground(white);
+
+        labelStart = new JLabel();
+        labelStart.setAlignmentX(Component.CENTER_ALIGNMENT);
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("PressStart2p-Regular.ttf")).deriveFont(20f);
+            labelStart.setFont(customFont);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        labelStart.setText("Start [ENTER]");
+        labelStart.setBackground(black);
+        labelStart.setForeground(white);
+
+        labelExit = new JLabel();
+        labelExit.setAlignmentX(Component.CENTER_ALIGNMENT);
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("PressStart2p-Regular.ttf")).deriveFont(20f);
+            labelExit.setFont(customFont);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        labelExit.setText("Exit [E]");
+        labelExit.setBackground(black);
+        labelExit.setForeground(white);
+
         this.addKeyListener(this);
+
+        startMenu.add(labelTitle);
+        startMenu.add(Box.createRigidArea(new Dimension(0, 150)));
+        startMenu.add(labelStart);
+        startMenu.add(Box.createRigidArea(new Dimension(0, 150)));
+        startMenu.add(labelExit);
 
         this.add(panelEndGame);
         this.add(labelScore);
         this.add(label);
+        this.add(startMenu);
         this.setVisible(true);
         this.pack();
 
-        timer = new Timer(20,this);
-        timer.start();
+        timer = new Timer(20, this);
+        //timer.start();
+
 
     }
 
 
     @Override
     public void keyTyped(KeyEvent e) {
-        if (e.getKeyChar() == ' '){
-            if (bullets.size() < bulletCount){
+        if (e.getKeyChar() == ' ') {
+            if (bullets.size() < bulletCount) {
                 JLabel bullet = new JLabel(bulletIcon);
-                bullet.setBounds(playerX + playerIcon.getIconWidth() / 2 - bulletIcon.getIconWidth() / 2, playerY,bulletIcon.getIconWidth(),bulletIcon.getIconHeight());
+                bullet.setBounds(playerX + playerIcon.getIconWidth() / 2 - bulletIcon.getIconWidth() / 2, playerY, bulletIcon.getIconWidth(), bulletIcon.getIconHeight());
                 bullets.add(bullet);
                 bulletYPositions.add(playerY);
                 this.add(bullet);
@@ -183,26 +244,33 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            startGame();
+        }
+        if (!startGame && ((e.getKeyCode() == KeyEvent.VK_E) || (e.getKeyCode() == KeyEvent.VK_ESCAPE))){
+            System.exit(0);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             moveLeft = true;
         }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             moveRight = true;
         }
-        label.setBounds(playerX,playerY,playerIcon.getIconWidth(),playerIcon.getIconHeight());
-        if (gameOver && e.getKeyCode() == KeyEvent.VK_Y){
+        label.setBounds(playerX, playerY, playerIcon.getIconWidth(), playerIcon.getIconHeight());
+        if (gameOver && e.getKeyCode() == KeyEvent.VK_Y) {
             resetGame();
         } else if (gameOver && (e.getKeyCode() == KeyEvent.VK_N)) {
             System.exit(0);
         }
+
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             moveLeft = false;
         }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             moveRight = false;
         }
     }
@@ -230,13 +298,13 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
                 fallingObjects.get(i).setBounds(fallingObjectXPositions.get(i), fallingObjectYPositions.get(i), fallingObject.getIconWidth(), fallingObject.getIconHeight());
 
                 Rectangle playerBounds = new Rectangle(playerX + 25
-                                                    , playerY + 25
-                                                    , playerIcon.getIconWidth() -35
-                                                    , playerIcon.getIconHeight() -5);
+                        , playerY + 25
+                        , playerIcon.getIconWidth() - 35
+                        , playerIcon.getIconHeight() - 5);
                 Rectangle meteorBounds = new Rectangle(fallingObjectXPositions.get(i) + 10
-                                                    ,fallingObjectYPositions.get(i) + 35
-                                                    , fallingObject.getIconWidth() -5
-                                                    ,fallingObject.getIconHeight() -10);
+                        , fallingObjectYPositions.get(i) + 35
+                        , fallingObject.getIconWidth() - 5
+                        , fallingObject.getIconHeight() - 10);
 
                 boolean collisionDetected = false;
 
@@ -250,9 +318,9 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
                         fallingObjectYPositions.set(i, -100);
                         fallingObjectXPositions.set(i, random.nextInt(800 - fallingObject.getIconWidth()));
                         fallingObjects.get(i).setBounds(fallingObjectXPositions.get(i),
-                                                      -100,
-                                                        fallingObject.getIconWidth(),
-                                                        fallingObject.getIconHeight());
+                                -100,
+                                fallingObject.getIconWidth(),
+                                fallingObject.getIconHeight());
                         collisionDetected = true;
                         score++;
                         labelScore.setText(String.valueOf(score) + " P");
@@ -271,7 +339,7 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
 
             }
 
-            for (int i = 0; i < bullets.size(); i++){
+            for (int i = 0; i < bullets.size(); i++) {
                 int newY = bulletYPositions.get(i) - bulletSpeed;
                 bulletYPositions.set(i, newY);
 
@@ -288,7 +356,8 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
         repaint();
 
     }
-    public void resetGame(){
+
+    public void resetGame() {
         playerX = 200;
         playerY = 600;
         score = 0;
@@ -308,6 +377,13 @@ public class SimpleGame  extends JFrame implements ActionListener,KeyListener {
         bulletYPositions.clear();
 
         panelEndGame.setVisible(false);  // Oyun bitti ekranını gizle
+        timer.start();
+    }
+    public void startGame(){
+        startGame = true;
+        label.setVisible(true);
+        labelScore.setVisible(true);
+        startMenu.setVisible(false);
         timer.start();
     }
 
